@@ -36,9 +36,9 @@ class DocCommand(Command):
 
 setup(
     name='VideoConverter',
-    version='1.1.0',
+    version='1.1.1',
     description='Video Converter library',
-    url='https://github.com/senko/python-video-converter/',
+    url='https://github.com/shamanu4/django-fine-uploader',
 
     author='Senko Rasic',
     author_email='senko.rasic@dobarkod.hr',
@@ -48,5 +48,5 @@ setup(
         'doc': DocCommand
     },
 
-    packages=['converter'],
+    packages=['converter'], requires=['urllib3']
 )

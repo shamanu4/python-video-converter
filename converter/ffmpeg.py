@@ -4,6 +4,7 @@ import os.path
 import os
 import re
 import signal
+from urllib3.util import parse_url
 from subprocess import Popen, PIPE
 import logging
 import locale
@@ -200,7 +201,6 @@ class MediaStreamInfo(object):
             if key == 'disposition:default':
                 self.sub_default = self.parse_int(val)
 
-
     def __repr__(self):
         d = ''
         metadata_str = ['%s=%s' % (key, value) for key, value
@@ -209,7 +209,7 @@ class MediaStreamInfo(object):
 
         if self.type == 'audio':
             d = 'type=%s, codec=%s, channels=%d, rate=%.0f' % (self.type,
-                self.codec, self.audio_channels, self.audio_samplerate)
+                                                               self.codec, self.audio_channels, self.audio_samplerate)
         elif self.type == 'video':
             d = 'type=%s, codec=%s, width=%d, height=%d, fps=%.1f' % (
                 self.type, self.codec, self.video_width, self.video_height,
@@ -353,6 +353,31 @@ class FFMpeg(object):
         return Popen(cmds, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
                      close_fds=True)
 
+    @staticmethod
+    def is_url(url):
+        #: Accept objects that have string representations.
+        try:
+            url = unicode(url)
+        except NameError:
+            # We're on Python 3.
+            url = str(url)
+        except UnicodeDecodeError:
+            pass
+
+        # Support for unicode domain names and paths.
+        scheme, auth, host, port, path, query, fragment = parse_url(url)
+
+        if not scheme or not host:
+            return False
+
+        # Only want to apply IDNA to the hostname
+        try:
+            host = host.encode('idna').decode('utf-8')
+        except UnicodeError:
+            return False
+
+        return True
+
     def probe(self, fname, posters_as_video=True):
         """
         Examine the media file and determine its format and media streams.
@@ -415,7 +440,7 @@ class FFMpeg(object):
         ...    pass # can be used to inform the user about conversion progress
 
         """
-        if not os.path.exists(infile):
+        if not os.path.exists(infile) and not self.ffmpeg.is_url(infile):
             raise FFMpegError("Input file doesn't exist: " + infile)
 
         cmds = [self.ffmpeg_path, '-i', infile]
