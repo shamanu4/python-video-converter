@@ -223,6 +223,13 @@ class Converter(object):
         """
         return self.ffmpeg.probe(fname, posters_as_video)
 
+    def json_probe(self, fname):
+        """
+        Examine the media file. See the documentation of
+        converter.FFMpeg.probe() for details.
+        """
+        return self.ffmpeg.json_probe(fname)
+
     def thumbnail(self, fname, time, outfile, size=None, quality=FFMpeg.DEFAULT_JPEG_QUALITY):
         """
         Create a thumbnail of the media file. See the documentation of

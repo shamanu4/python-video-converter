@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import json
 import os.path
 import os
 import re
@@ -417,6 +417,21 @@ class FFMpeg(object):
         if not info.format.format and len(info.streams) == 0:
             return None
 
+        return info
+
+    def json_probe(self, fname):
+        p = self._spawn([self.ffprobe_path,
+                         '-v', 'quiet', '-show_format', '-show_streams', '-print_format', 'json', fname])
+        stdout_data, _ = p.communicate()
+        stdout_data = stdout_data.decode(console_encoding)
+
+        try:
+            info = json.loads(stdout_data)
+        except Exception as e:
+            raise ValueError("Can't get input file format. Error: `%s`" % e)
+
+        if "streams" not in info.keys():
+            raise ValueError("Can't get input file format")
         return info
 
     def convert(self, infile, outfile, opts, timeout=10):
