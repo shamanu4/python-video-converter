@@ -560,7 +560,7 @@ class FFMpeg(object):
         >>> FFMpeg().thumbnails('test1.ogg', [(5, '/tmp/shot.png', '320x240'),
         >>>                                   (10, '/tmp/shot2.png', None, 5)])
         """
-        if not os.path.exists(fname):
+        if not os.path.exists(fname) and not self.is_url(fname):
             raise IOError('No such file: ' + fname)
 
         cmds = [self.ffmpeg_path, '-i', fname, '-y', '-an']
