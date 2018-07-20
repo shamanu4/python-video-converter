@@ -403,7 +403,7 @@ class FFMpeg(object):
             A video stream, defaults to True
         """
 
-        if not os.path.exists(fname):
+        if not os.path.exists(fname) and not self.is_url(fname):
             return None
 
         info = MediaInfo(posters_as_video)
