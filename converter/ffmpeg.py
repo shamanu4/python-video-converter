@@ -8,6 +8,7 @@ from urllib3.util import parse_url
 from subprocess import Popen, PIPE
 import logging
 import locale
+from unidecode import unidecode
 
 logger = logging.getLogger(__name__)
 
@@ -411,7 +412,12 @@ class FFMpeg(object):
         p = self._spawn([self.ffprobe_path,
                          '-show_format', '-show_streams', fname])
         stdout_data, _ = p.communicate()
-        stdout_data = stdout_data.decode(console_encoding)
+
+        try:
+            stdout_data = stdout_data.decode(console_encoding)
+        except UnicodeDecodeError:
+            stdout_data = unidecode(stdout_data.decode(console_encoding, errors='ignore'))
+
         info.parse_ffprobe(stdout_data)
 
         if not info.format.format and len(info.streams) == 0:
@@ -423,7 +429,11 @@ class FFMpeg(object):
         p = self._spawn([self.ffprobe_path,
                          '-v', 'quiet', '-show_format', '-show_streams', '-print_format', 'json', fname])
         stdout_data, _ = p.communicate()
-        stdout_data = stdout_data.decode(console_encoding)
+
+        try:
+            stdout_data = stdout_data.decode(console_encoding)
+        except UnicodeDecodeError:
+            stdout_data = unidecode(stdout_data.decode(console_encoding, errors='ignore'))
 
         try:
             info = json.loads(stdout_data)
@@ -490,7 +500,11 @@ class FFMpeg(object):
             if not ret:
                 break
 
-            ret = ret.decode(console_encoding)
+            try:
+                ret = ret.decode(console_encoding)
+            except UnicodeDecodeError:
+                ret = unidecode(ret.decode(console_encoding, errors='ignore'))
+
             total_output += ret
             buf += ret
             if '\r' in buf:
@@ -578,6 +592,11 @@ class FFMpeg(object):
         _, stderr_data = p.communicate()
         if stderr_data == '':
             raise FFMpegError('Error while calling ffmpeg binary')
-        stderr_data.decode(console_encoding)
+
+        try:
+            stderr_data.decode(console_encoding)
+        except UnicodeDecodeError:
+            stderr_data = unidecode(stderr_data.decode(console_encoding, errors='ignore'))
+
         if any(not os.path.exists(option[1]) for option in option_list):
             raise FFMpegError('Error creating thumbnail: %s' % stderr_data)

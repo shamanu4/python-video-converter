@@ -48,5 +48,5 @@ setup(
         'doc': DocCommand
     },
 
-    packages=['converter'], requires=['urllib3']
+    packages=['converter'], requires=['urllib3', 'unidecode']
 )
