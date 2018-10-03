@@ -127,7 +127,9 @@ class Converter(object):
                 raise ConverterError('input options need to be a dict')
             else:
                 for k, v in opt['input'].items():
-                    input_options.extend(["-%s" % k, v])
+                    input_options.extend(["-%s" % k.strip('-'), str(v)])
+        if input_options:
+            input_options.append("::")  # separate input options from other, this hack is used in convert function
 
         output_options = []
         if 'output' in opt:
@@ -135,7 +137,7 @@ class Converter(object):
                 raise ConverterError('output options need to be a dict')
             else:
                 for k, v in opt['output'].items():
-                    output_options.extend(["-%s" % k, v])
+                    output_options.extend(["-%s" % k.strip('-'), str(v)])
 
         # aggregate all options
         optlist = input_options + audio_options + video_options + subtitle_options + format_options + output_options

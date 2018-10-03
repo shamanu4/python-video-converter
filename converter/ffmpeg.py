@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from itertools import groupby
 import json
 import os.path
 import os
@@ -469,7 +470,16 @@ class FFMpeg(object):
         if not os.path.exists(infile) and not self.is_url(infile):
             raise FFMpegError("Input file doesn't exist: " + infile)
 
-        cmds = [self.ffmpeg_path, '-i', infile]
+        g_opts = [list(group) for k, group in groupby(opts, lambda x: x == "::") if not k]
+        if len(g_opts) > 1:
+            input_opts = g_opts[0]
+            opts = g_opts[1]
+        else:
+            input_opts = []
+
+        cmds = [self.ffmpeg_path]
+        cmds.extend(input_opts)
+        cmds.extend(['-i', infile])
         cmds.extend(opts)
         cmds.extend(['-y', outfile])
 
