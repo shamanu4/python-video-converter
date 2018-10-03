@@ -132,7 +132,7 @@ class Converter(object):
         output_options = []
         if 'output' in opt:
             if not type(opt['output']) == dict:
-                raise ConverterError('input output need to be a dict')
+                raise ConverterError('output options need to be a dict')
             else:
                 for k, v in opt['output'].items():
                     output_options.extend(["-%s" % k, v])
