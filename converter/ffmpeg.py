@@ -410,7 +410,7 @@ class FFMpeg(object):
         info = MediaInfo(posters_as_video)
 
         p = self._spawn([self.ffprobe_path,
-                         '-show_format', '-show_streams', fname])
+                         '-analyzeduration', '100M', '-probesize', '100M', '-show_format', '-show_streams', fname])
         stdout_data, _ = p.communicate()
 
         try:
@@ -427,6 +427,7 @@ class FFMpeg(object):
 
     def json_probe(self, fname):
         p = self._spawn([self.ffprobe_path,
+                         '-analyzeduration', '100M', '-probesize', '100M',
                          '-v', 'quiet', '-show_format', '-show_streams', '-print_format', 'json', fname])
         stdout_data, _ = p.communicate()
 

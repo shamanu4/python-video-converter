@@ -121,9 +121,24 @@ class Converter(object):
             else:
                 format_options.extend(['-map', str(m)])
 
+        input_options = []
+        if 'input' in opt:
+            if not type(opt['input']) == dict:
+                raise ConverterError('input options need to be a dict')
+            else:
+                for k, v in opt['input'].items():
+                    input_options.extend(["-%s" % k, v])
+
+        output_options = []
+        if 'output' in opt:
+            if not type(opt['output']) == dict:
+                raise ConverterError('input output need to be a dict')
+            else:
+                for k, v in opt['output'].items():
+                    output_options.extend(["-%s" % k, v])
 
         # aggregate all options
-        optlist = audio_options + video_options + subtitle_options + format_options
+        optlist = input_options + audio_options + video_options + subtitle_options + format_options + output_options
 
         if twopass == 1:
             optlist.extend(['-pass', '1'])
