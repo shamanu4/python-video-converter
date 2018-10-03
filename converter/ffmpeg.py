@@ -588,13 +588,12 @@ class FFMpeg(object):
         if not os.path.exists(fname) and not self.is_url(fname):
             raise IOError('No such file: ' + fname)
 
-        cmds = [self.ffmpeg_path, '-i', fname, '-y', '-an']
+        cmds = [self.ffmpeg_path, '-analyzeduration', '100M', '-probesize', '100M', '-i', fname, '-y', '-an']
         for thumb in option_list:
             if len(thumb) > 2 and thumb[2]:
                 cmds.extend(['-s', str(thumb[2])])
 
             cmds.extend([
-                '-analyzeduration', '100M', '-probesize', '100M',
                 '-f', 'image2', '-vframes', '1',
                 '-ss', str(thumb[0]), thumb[1],
                 '-q:v', str(FFMpeg.DEFAULT_JPEG_QUALITY if len(thumb) < 4 else str(thumb[3])),
